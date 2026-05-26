@@ -10,34 +10,9 @@ OR CONDITIONS OF ANY KIND, either express or implied.
 
 package cfg
 
-import (
-	"os"
+func getOrGenerateJWTSecret() string { _ = "STUB: not implemented"; return "" }
 
-	securerandom "github.com/theckman/go-securerandom"
-)
+// then generate a new secret and store it in the file
 
-func getOrGenerateJWTSecret() string {
-	b, err := os.ReadFile(secretFile)
-	if err == nil {
-		log.Info("jwt.secret read from " + secretFile)
-	} else {
-		// then generate a new secret and store it in the file
-		log.Debug(err)
-		log.Info("jwt.secret not found in " + secretFile)
-		log.Warn("generating random jwt.secret and storing it in " + secretFile)
-
-		// make sure to create 256 bits for the secret
-		// see https://github.com/vouch/vouch-proxy/issues/54
-		rstr, err := securerandom.Base64OfBytes(base64Bytes)
-		if err != nil {
-			log.Fatal(err)
-		}
-		b = []byte(rstr)
-		err = os.WriteFile(secretFile, b, 0600)
-		if err != nil {
-			log.Error(err)
-			logSysInfo()
-		}
-	}
-	return string(b)
-}
+// make sure to create 256 bits for the secret
+// see https://github.com/vouch/vouch-proxy/issues/54

@@ -12,9 +12,7 @@ package cfg
 
 import (
 	"os"
-	"strconv"
 
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -62,85 +60,49 @@ func init() {
 }
 
 func (logging) setLogLevel(lvl zapcore.Level) {
+	_ = "STUB: not implemented"
 	// https://github.com/uber-go/zap/blob/master/zapcore/level.go#L59
-	if Logging.AtomicLogLevel.Level() != lvl {
-		log.Infof("setting LogLevel to %s", lvl)
-		Logging.AtomicLogLevel.SetLevel(lvl)
-	}
+	return
 }
 
-func (logging) setLogLevelString(str string) {
-	if err := CmdLine.logLevel.Set(str); err != nil {
-		log.Fatal(err)
-	}
-	Logging.setLogLevel(*CmdLine.logLevel)
-}
+func (logging) setLogLevelString(str string) { _ = "STUB: not implemented"; return }
 
 func (logging) setDevelopmentLogger() {
+	_ = "STUB: not implemented"
 	// then configure the logger for development output
-	clone := Logging.FastLogger.WithOptions(
-		zap.WrapCore(
-			// func(zapcore.Core) zapcore.Core {
-			func(zapcore.Core) zapcore.Core {
-				return zapcore.NewCore(zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()), zapcore.AddSync(os.Stderr), Logging.AtomicLogLevel)
-			}))
-	// zap.ReplaceGlobals(clone)
-	log = clone.Sugar()
-	// Logging.FastLogger = log.Desugar()
-	// Logging.Logger = log
-	Logging.FastLogger = log.Desugar()
-	Logging.Logger = log
-	log.Infof("testing: %s, using development console logger", strconv.FormatBool(Cfg.Testing))
+	return
 }
+
+// func(zapcore.Core) zapcore.Core {
+
+// zap.ReplaceGlobals(clone)
+
+// Logging.FastLogger = log.Desugar()
+// Logging.Logger = log
 
 var configured = false
 
 func (logging) configure() {
+	_ = "STUB: not implemented"
 	// logging
-
-	if configured {
-		return
-	}
-
-	// then we weren't configured via command line, check the config file
-	if !viper.IsSet(Branding.LCName + ".logLevel") {
-		// then we weren't configured via the config file, set the default
-		Cfg.LogLevel = Logging.DefaultLogLevel.String()
-	}
-
-	if Cfg.LogLevel != Logging.AtomicLogLevel.Level().String() {
-		// log.Errorf("Logging.configure() Logging.LogLevel %s Cfg.LogLevel %s", Logging.LogLeveLogging.String(), Cfg.LogLevel)
-		Logging.setLogLevelString(Cfg.LogLevel)
-	}
-
-	// if we're supposed to run tests, run tests and exit
-	if *CmdLine.logTest {
-		Logging.cmdlineTestLogs()
-	}
-
-	configured = true
+	return
 }
 
-func (logging) configureFromCmdline() {
+// then we weren't configured via command line, check the config file
 
-	if *CmdLine.logLevel != cmdLineLoggingDefault {
-		Logging.setLogLevel(*CmdLine.logLevel) // defaults to Logging.DefaultLogLevel which is zap.InfoLevel
-		log.Info("logging configured from cmdline")
-		// if we're supposed to run tests, run tests and exit
-		if *CmdLine.logTest {
-			Logging.cmdlineTestLogs()
-		}
+// then we weren't configured via the config file, set the default
 
-		configured = true
-	}
-}
+// log.Errorf("Logging.configure() Logging.LogLevel %s Cfg.LogLevel %s", Logging.LogLeveLogging.String(), Cfg.LogLevel)
+
+// if we're supposed to run tests, run tests and exit
+
+func (logging) configureFromCmdline() { _ = "STUB: not implemented"; return }
+
+// defaults to Logging.DefaultLogLevel which is zap.InfoLevel
+
+// if we're supposed to run tests, run tests and exit
 
 // in support of `./do.sh test_logging`
-func (logging) cmdlineTestLogs() {
-	Logging.Logger.Error("error")
-	Logging.Logger.Warn("warn")
-	Logging.Logger.Info("info")
-	Logging.Logger.Debug("debug")
-	// Logging.Logger.Panic("panic")
-	os.Exit(0)
-}
+func (logging) cmdlineTestLogs() { _ = "STUB: not implemented"; return }
+
+// Logging.Logger.Panic("panic")

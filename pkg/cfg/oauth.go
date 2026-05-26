@@ -11,14 +11,7 @@ OR CONDITIONS OF ANY KIND, either express or implied.
 package cfg
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"strings"
-
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/github"
-	"golang.org/x/oauth2/google"
 )
 
 var (
@@ -102,245 +95,62 @@ type oauthClaimValueConfig struct {
 }
 
 func configureOauth() error {
+	_ = "STUB: not implemented"
 	// OAuth defaults and client configuration
-	if err := UnmarshalKey("oauth", &GenOAuth); err != nil {
-		return err
-	}
-	if GenOAuth.Claims != nil {
-		claims, err := json.Marshal(GenOAuth.Claims)
-		if err != nil {
-			return err
-		}
-		log.Infof("setting OAuth param 'claims' to %s", claims)
-		OAuthopts = append(OAuthopts, oauth2.SetAuthURLParam("claims", string(claims)))
-	}
 	return nil
 }
 
-func oauthBasicTest() error {
-	if GenOAuth.Provider != Providers.Google &&
-		GenOAuth.Provider != Providers.GitHub &&
-		GenOAuth.Provider != Providers.IndieAuth &&
-		GenOAuth.Provider != Providers.HomeAssistant &&
-		GenOAuth.Provider != Providers.ADFS &&
-		GenOAuth.Provider != Providers.Azure &&
-		GenOAuth.Provider != Providers.OIDC &&
-		GenOAuth.Provider != Providers.OpenStax &&
-		GenOAuth.Provider != Providers.Nextcloud &&
-		GenOAuth.Provider != Providers.Alibaba &&
-		GenOAuth.Provider != Providers.Discord {
-		return errors.New("configuration error: Unknown oauth provider: " + GenOAuth.Provider)
-	}
-	// OAuthconfig Checks
-	switch {
-	case GenOAuth.ClientID == "":
-		// everyone has a clientID
-		return errors.New("configuration error: oauth.client_id not found")
-	case GenOAuth.Provider != Providers.IndieAuth && GenOAuth.Provider != Providers.HomeAssistant && GenOAuth.Provider != Providers.ADFS && GenOAuth.Provider != Providers.OIDC && GenOAuth.ClientSecret == "":
-		// everyone except IndieAuth has a clientSecret
-		// ADFS and OIDC providers also do not require this, but can have it optionally set.
-		return errors.New("configuration error: oauth.client_secret not found")
-	case GenOAuth.Provider != Providers.Google && GenOAuth.AuthURL == "":
-		// everyone except IndieAuth and Google has an authURL
-		return errors.New("configuration error: oauth.auth_url not found")
-	case GenOAuth.Provider != Providers.Google && GenOAuth.Provider != Providers.IndieAuth && GenOAuth.Provider != Providers.HomeAssistant && GenOAuth.Provider != Providers.ADFS && GenOAuth.Provider != Providers.Azure && GenOAuth.UserInfoURL == "":
-		// everyone except IndieAuth, Google and ADFS has an userInfoURL, and Azure does not actively use it
-		return errors.New("configuration error: oauth.user_info_url not found")
-	case GenOAuth.Provider != Providers.Discord && GenOAuth.DiscordUseIDs:
-		return errors.New("configuration error: discord_use_ids is true but oauth.provider is not 'discord'")
-	case GenOAuth.CodeChallengeMethod != "" && (GenOAuth.CodeChallengeMethod != "plain" && GenOAuth.CodeChallengeMethod != "S256"):
-		return errors.New("configuration error: oauth.code_challenge_method must be either 'S256' or 'plain'")
-	case GenOAuth.Provider == Providers.Azure || GenOAuth.Provider == Providers.ADFS || GenOAuth.Provider == Providers.Nextcloud || GenOAuth.Provider == Providers.OIDC:
-		checkScopes([]string{"openid", "email", "profile"})
-	}
+func oauthBasicTest() error { _ = "STUB: not implemented"; return nil }
 
-	if GenOAuth.RedirectURL != "" {
-		if err := checkCallbackConfig(GenOAuth.RedirectURL); err != nil {
-			return err
-		}
-	}
-	if len(GenOAuth.RedirectURLs) > 0 {
-		for _, cb := range GenOAuth.RedirectURLs {
-			if err := checkCallbackConfig(cb); err != nil {
-				return err
-			}
-		}
-	}
+// OAuthconfig Checks
 
-	return nil
-}
+// everyone has a clientID
 
-func checkScopes(scopes []string) {
-	for _, s := range scopes {
-		if !arrContains(GenOAuth.Scopes, s) {
-			log.Warnf("Configuration Warning: for 'oauth.provider: %s', 'oauth.scopes' should usually contain: -%s", GenOAuth.Provider, strings.Join(scopes, " -"))
-			return
-		}
-	}
-}
+// everyone except IndieAuth has a clientSecret
+// ADFS and OIDC providers also do not require this, but can have it optionally set.
+
+// everyone except IndieAuth and Google has an authURL
+
+// everyone except IndieAuth, Google and ADFS has an userInfoURL, and Azure does not actively use it
+
+func checkScopes(scopes []string) { _ = "STUB: not implemented"; return }
 
 // TODO: all of these methods should become `provider.SetDefaults()` or `provider.SetDefaults(*GenOAuth)`
-func setProviderDefaults() {
-	if GenOAuth.Provider == Providers.Google {
-		setDefaultsGoogle()
-		// setDefaultsGoogle also configures the OAuthClient
-	} else if GenOAuth.Provider == Providers.GitHub {
-		setDefaultsGitHub()
-		configureOAuthClient()
-	} else if GenOAuth.Provider == Providers.ADFS {
-		setDefaultsADFS()
-		configureOAuthClient()
-	} else if GenOAuth.Provider == Providers.Azure {
-		setDefaultsAzure()
-		configureOAuthClient()
-	} else if GenOAuth.Provider == Providers.IndieAuth {
-		GenOAuth.CodeChallengeMethod = "S256"
-		configureOAuthClient()
-	} else if GenOAuth.Provider == Providers.Discord {
-		setDefaultsDiscord()
-		configureOAuthClient()
-	} else {
-		// OIDC, OpenStax, Nextcloud
-		configureOAuthClient()
-	}
-}
+func setProviderDefaults() { _ = "STUB: not implemented"; return }
 
-func setDefaultsGoogle() {
-	log.Info("configuring Google OAuth")
-	GenOAuth.UserInfoURL = "https://www.googleapis.com/oauth2/v3/userinfo"
-	if len(GenOAuth.Scopes) == 0 {
-		// You have to select a scope from
-		// https://developers.google.com/identity/protocols/googlescopes#google_sign-in
-		GenOAuth.Scopes = []string{"email"}
-	}
-	OAuthClient = &oauth2.Config{
-		ClientID:     GenOAuth.ClientID,
-		ClientSecret: GenOAuth.ClientSecret,
-		Scopes:       GenOAuth.Scopes,
-		Endpoint:     google.Endpoint,
-		RedirectURL:  GenOAuth.RedirectURL,
-	}
-	if GenOAuth.PreferredDomain != "" {
-		log.Infof("setting Google OAuth preferred login domain param 'hd' to %s", GenOAuth.PreferredDomain)
-		OAuthopts = append(OAuthopts, oauth2.SetAuthURLParam("hd", GenOAuth.PreferredDomain))
-	}
-	GenOAuth.CodeChallengeMethod = "S256"
-}
+// setDefaultsGoogle also configures the OAuthClient
 
-func setDefaultsADFS() {
-	log.Info("configuring ADFS OAuth")
+// OIDC, OpenStax, Nextcloud
 
-	if GenOAuth.RelyingPartyId == "" {
-		GenOAuth.RelyingPartyId = GenOAuth.RedirectURL
-	}
+func setDefaultsGoogle() { _ = "STUB: not implemented"; return }
 
-	OAuthopts = append(OAuthopts, oauth2.SetAuthURLParam("resource", GenOAuth.RelyingPartyId))
-}
+// You have to select a scope from
+// https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 
-func setDefaultsAzure() {
-	log.Info("configuring Azure OAuth")
-	if len(GenOAuth.AzureToken) == 0 {
-		log.Info("Using Default Azure Token: access_token")
-		GenOAuth.AzureToken = "access_token"
-	} else if GenOAuth.AzureToken == "access_token" {
-		log.Info("Using Azure Token: access_token")
-	} else if GenOAuth.AzureToken == "id_token" {
-		log.Info("Using Azure Token: id_token")
-	} else {
-		log.Fatal("'oauth.azure_token' must be either 'access_token' or 'id_token'")
-	}
-	GenOAuth.CodeChallengeMethod = "S256"
-}
+func setDefaultsADFS() { _ = "STUB: not implemented"; return }
+
+func setDefaultsAzure() { _ = "STUB: not implemented"; return }
 
 func setDefaultsGitHub() {
+	_ = "STUB: not implemented"
 	// log.Info("configuring GitHub OAuth")
-	if GenOAuth.AuthURL == "" {
-		GenOAuth.AuthURL = github.Endpoint.AuthURL
-	}
-	if GenOAuth.TokenURL == "" {
-		GenOAuth.TokenURL = github.Endpoint.TokenURL
-	}
-	if GenOAuth.UserInfoURL == "" {
-		GenOAuth.UserInfoURL = "https://api.github.com/user"
-	}
-	if GenOAuth.UserTeamURL == "" {
-		GenOAuth.UserTeamURL = "https://api.github.com/orgs/:org_id/teams/:team_slug/memberships/:username"
-	}
-	if GenOAuth.UserOrgURL == "" {
-		GenOAuth.UserOrgURL = "https://api.github.com/orgs/:org_id/members/:username"
-	}
-	if len(GenOAuth.Scopes) == 0 {
-		// https://github.com/vouch/vouch-proxy/issues/63
-		// https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
-		GenOAuth.Scopes = []string{"read:user"}
-
-		if len(Cfg.TeamWhiteList) > 0 {
-			GenOAuth.Scopes = append(GenOAuth.Scopes, "read:org")
-		}
-	}
-	GenOAuth.CodeChallengeMethod = "S256"
+	return
 }
+
+// https://github.com/vouch/vouch-proxy/issues/63
+// https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
 
 func setDefaultsDiscord() {
+	_ = "STUB: not implemented"
 	// log.Info("configuring GitHub OAuth")
-	if GenOAuth.AuthURL == "" {
-		GenOAuth.AuthURL = "https://discord.com/oauth2/authorize"
-	}
-	if GenOAuth.TokenURL == "" {
-		GenOAuth.TokenURL = "https://discord.com/api/oauth2/token"
-	}
-	if GenOAuth.UserInfoURL == "" {
-		GenOAuth.UserInfoURL = "https://discord.com/api/users/@me"
-	}
-	if len(GenOAuth.Scopes) == 0 {
-		//Required for UserInfo URL
-		//https://discord.com/developers/docs/resources/user#get-current-user
-		GenOAuth.Scopes = []string{"identify", "email"}
-	}
-	GenOAuth.CodeChallengeMethod = "S256"
+	return
 }
 
-func configureOAuthClient() {
-	log.Infof("configuring %s OAuth with Endpoint %s", GenOAuth.Provider, GenOAuth.AuthURL)
-	OAuthClient = &oauth2.Config{
-		ClientID:     GenOAuth.ClientID,
-		ClientSecret: GenOAuth.ClientSecret,
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  GenOAuth.AuthURL,
-			TokenURL: GenOAuth.TokenURL,
-		},
-		RedirectURL: GenOAuth.RedirectURL,
-		Scopes:      GenOAuth.Scopes,
-	}
-}
+//Required for UserInfo URL
+//https://discord.com/developers/docs/resources/user#get-current-user
 
-func checkCallbackConfig(url string) error {
-	if !strings.Contains(url, "/auth") {
-		log.Errorf("configuration error: oauth.callback_url (%s) should almost always point at the vouch-proxy '/auth' endpoint", url)
-	}
+func configureOAuthClient() { _ = "STUB: not implemented"; return }
 
-	found := false
-	for _, d := range append(Cfg.Domains, Cfg.Cookie.Domain) {
-		if d != "" && strings.Contains(url, d) {
-			found = true
-			break
-		}
-	}
-	if !found {
-		return fmt.Errorf("configuration error: oauth.callback_url (%s) must be within a configured domains where the cookie will be set: either `vouch.domains` %s or `vouch.cookie.domain` %s",
-			url,
-			Cfg.Domains,
-			Cfg.Cookie.Domain)
-	}
+func checkCallbackConfig(url string) error { _ = "STUB: not implemented"; return nil }
 
-	return nil
-}
-
-func arrContains(arr []string, str string) bool {
-	for _, v := range arr {
-		if v == str {
-			return true
-		}
-	}
-	return false
-}
+func arrContains(arr []string, str string) bool { _ = "STUB: not implemented"; return false }

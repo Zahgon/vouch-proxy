@@ -12,9 +12,7 @@ package capturewriter
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/vouch/vouch-proxy/pkg/cfg"
 	"go.uber.org/zap"
 )
 
@@ -27,8 +25,9 @@ var log *zap.Logger
 
 // Configure see main.go configure()
 func Configure() {
+	_ = "STUB: not implemented"
 	// logger = cfg.Logging.Logger
-	log = cfg.Logging.FastLogger
+	return
 }
 
 // CaptureWriter extends http.ResponseWriter
@@ -37,27 +36,15 @@ type CaptureWriter struct {
 	StatusCode int
 }
 
-func (w *CaptureWriter) Write(b []byte) (int, error) {
-	if w.StatusCode == 0 {
-		w.StatusCode = 200
-		// log.Debug("CaptureWriter.Write set w.StatusCode " + strconv.Itoa(w.StatusCode))
-	}
-	return w.ResponseWriter.Write(b)
-}
+func (w *CaptureWriter) Write(b []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
+
+// log.Debug("CaptureWriter.Write set w.StatusCode " + strconv.Itoa(w.StatusCode))
 
 // Header calls http.Writer.Header()
-func (w *CaptureWriter) Header() http.Header {
-	return w.ResponseWriter.Header()
-}
+func (w *CaptureWriter) Header() http.Header { _ = "STUB: not implemented"; return *new(http.Header) }
 
 // WriteHeader calls http.Writer.WriteHeader(code)
-func (w *CaptureWriter) WriteHeader(code int) {
-	w.StatusCode = code
-	log.Debug("CaptureWriter.Write set w.StatusCode " + strconv.Itoa(w.StatusCode))
-	w.ResponseWriter.WriteHeader(code)
-}
+func (w *CaptureWriter) WriteHeader(code int) { _ = "STUB: not implemented"; return }
 
 // GetStatusCode return w.StatusCode
-func (w *CaptureWriter) GetStatusCode() int {
-	return w.StatusCode
-}
+func (w *CaptureWriter) GetStatusCode() int { _ = "STUB: not implemented"; return 0 }

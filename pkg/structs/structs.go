@@ -10,10 +10,6 @@ OR CONDITIONS OF ANY KIND, either express or implied.
 
 package structs
 
-import (
-	"strconv"
-)
-
 // CustomClaims Temporary struct storing custom claims until JWT creation.
 type CustomClaims struct {
 	Claims map[string]interface{}
@@ -42,11 +38,7 @@ type User struct {
 }
 
 // PrepareUserData implement PersonalData interface
-func (u *User) PrepareUserData() {
-	if u.Username == "" {
-		u.Username = u.Email
-	}
-}
+func (u *User) PrepareUserData() { _ = "STUB: not implemented"; return }
 
 // AzureUser is a retrieved and authenticated user from Azure AD
 type AzureUser struct {
@@ -58,20 +50,10 @@ type AzureUser struct {
 
 // PrepareUserData implement PersonalData interface
 func (u *AzureUser) PrepareUserData() {
+	_ = "STUB: not implemented"
 	// AzureAD uses the 'upn' (UserPrincipleName) field to store the email address of the user
 	// See https://docs.microsoft.com/en-us/azure/active-directory/hybrid/plan-connect-userprincipalname
-
-	if u.Username == "" {
-		u.Username = u.UPN
-	}
-
-	if u.Username == "" {
-		u.Username = u.PreferredUsername
-	}
-
-	if u.Email == "" {
-		u.Email = u.UPN
-	}
+	return
 }
 
 // GoogleUser is a retrieved and authentiacted user from Google.
@@ -92,9 +74,7 @@ type GoogleUser struct {
 }
 
 // PrepareUserData implement PersonalData interface
-func (u *GoogleUser) PrepareUserData() {
-	u.Username = u.Email
-}
+func (u *GoogleUser) PrepareUserData() { _ = "STUB: not implemented"; return }
 
 // ADFSUser Active Directory user record
 type ADFSUser struct {
@@ -110,10 +90,12 @@ type ADFSUser struct {
 
 // PrepareUserData implement PersonalData interface
 func (u *ADFSUser) PrepareUserData() {
-	u.Username = u.UPN
+	_ = "STUB: not implemented"
+
+	// GitHubUser is a retrieved and authentiacted user from GitHub.
+	return
 }
 
-// GitHubUser is a retrieved and authentiacted user from GitHub.
 type GitHubUser struct {
 	User
 	Login   string `json:"login"`
@@ -128,8 +110,9 @@ type GitHubTeamMembershipState struct {
 
 // PrepareUserData implement PersonalData interface
 func (u *GitHubUser) PrepareUserData() {
+	_ = "STUB: not implemented"
 	// always use the u.Login as the u.Username
-	u.Username = u.Login
+	return
 }
 
 // IndieAuthUser see indieauth.net
@@ -140,10 +123,12 @@ type IndieAuthUser struct {
 
 // PrepareUserData implement PersonalData interface
 func (u *IndieAuthUser) PrepareUserData() {
-	u.Username = u.URL
+	_ = "STUB: not implemented"
+
+	// Contact used for OpenStaxUser
+	return
 }
 
-// Contact used for OpenStaxUser
 type Contact struct {
 	Type     string `json:"type"`
 	Value    string `json:"value"`
@@ -158,15 +143,10 @@ type OpenStaxUser struct {
 
 // PrepareUserData implement PersonalData interface
 func (u *OpenStaxUser) PrepareUserData() {
-	if u.Email == "" {
-		// assuming first contact of type "EmailAddress"
-		for _, c := range u.Contacts {
-			if c.Type == "EmailAddress" && c.Verified {
-				u.Email = c.Value
-				break
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+
+	// assuming first contact of type "EmailAddress"
+	return
 }
 
 // Ocs used for NextcloudUser
@@ -184,12 +164,7 @@ type NextcloudUser struct {
 }
 
 // PrepareUserData NextcloudUser
-func (u *NextcloudUser) PrepareUserData() {
-	if u.Username == "" {
-		u.Username = u.Ocs.Data.UserID
-		u.Email = u.Ocs.Data.Email
-	}
-}
+func (u *NextcloudUser) PrepareUserData() { _ = "STUB: not implemented"; return }
 
 // AlibabaUser Aliyun
 type AlibabaUser struct {
@@ -199,13 +174,7 @@ type AlibabaUser struct {
 }
 
 // PrepareUserData implement PersonalData interface
-func (u *AlibabaUser) PrepareUserData() {
-	u.Username = u.Data.Username
-	u.Name = u.Data.Nickname
-	u.Email = u.Data.Email
-	id, _ := strconv.Atoi(u.Data.ID)
-	u.ID = id
-}
+func (u *AlibabaUser) PrepareUserData() { _ = "STUB: not implemented"; return }
 
 // AliData `data` subobject of Alibaba User response
 // https://github.com/vouch/vouch-proxy/issues/344

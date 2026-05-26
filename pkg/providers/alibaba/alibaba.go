@@ -11,14 +11,10 @@ OR CONDITIONS OF ANY KIND, either express or implied.
 package alibaba
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
 
 	"golang.org/x/oauth2"
 
-	"github.com/vouch/vouch-proxy/pkg/cfg"
-	"github.com/vouch/vouch-proxy/pkg/providers/common"
 	"github.com/vouch/vouch-proxy/pkg/structs"
 	"go.uber.org/zap"
 )
@@ -29,38 +25,10 @@ type Provider struct{}
 var log *zap.SugaredLogger
 
 // Configure see main.go configure()
-func (Provider) Configure() {
-	log = cfg.Logging.Logger
-}
+func (Provider) Configure() { _ = "STUB: not implemented"; return }
 
 // GetUserInfo provider specific call to get userinfomation
 func (Provider) GetUserInfo(r *http.Request, user *structs.User, customClaims *structs.CustomClaims, ptokens *structs.PTokens, opts ...oauth2.AuthCodeOption) (rerr error) {
-	client, _, err := common.PrepareTokensAndClient(r, ptokens, true)
-	if err != nil {
-		return err
-	}
-	userinfo, err := client.Get(cfg.GenOAuth.UserInfoURL)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := userinfo.Body.Close(); err != nil {
-			rerr = err
-		}
-	}()
-	data, _ := io.ReadAll(userinfo.Body)
-	log.Infof("Alibaba userinfo body: %s", string(data))
-	if err = common.MapClaims(data, customClaims); err != nil {
-		log.Error(err)
-		return err
-	}
-	aliUser := structs.AlibabaUser{}
-	if err = json.Unmarshal(data, &aliUser); err != nil {
-		log.Error(err)
-		return err
-	}
-	aliUser.PrepareUserData()
-	user.Username = aliUser.Username
-	user.Email = aliUser.Email
+	_ = "STUB: not implemented"
 	return nil
 }

@@ -11,54 +11,20 @@ OR CONDITIONS OF ANY KIND, either express or implied.
 package healthcheck
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"os"
-
-	"github.com/vouch/vouch-proxy/pkg/cfg"
 	"go.uber.org/zap"
 )
 
 var log *zap.SugaredLogger
 
 func configure() {
+	_ = "STUB: not implemented"
 	// cfg.ConfigureLogger()
-	log = cfg.Logging.Logger
-	if !cfg.Cfg.Testing {
-		cfg.Logging.AtomicLogLevel.SetLevel(zap.ErrorLevel)
-	}
+	return
 }
 
 // CheckAndExitIfIsHealthCheck healthcheck is a command line flag `-healthcheck`
-func CheckAndExitIfIsHealthCheck() {
+func CheckAndExitIfIsHealthCheck() { _ = "STUB: not implemented"; return }
 
-	if *cfg.CmdLine.IsHealthCheck {
-		configure()
-		healthcheck()
-	}
-}
+func healthcheck() { _ = "STUB: not implemented"; return }
 
-func healthcheck() {
-	url := fmt.Sprintf("http://%s:%d/healthcheck", cfg.Cfg.Listen, cfg.Cfg.Port)
-	log.Debugf("Invoking healthcheck on %s", url)
-	// #nosec - turn off gosec checking which flags `http.Get(url)`
-	resp, err := http.Get(url)
-	if err == nil {
-		body, err := io.ReadAll(resp.Body)
-		resp.Body.Close()
-		if err == nil {
-			var result map[string]interface{}
-			jsonErr := json.Unmarshal(body, &result)
-			if jsonErr == nil {
-				if result["ok"] == true {
-					log.Debugf("Healthcheck succeeded for %s", url)
-					os.Exit(0)
-				}
-			}
-		}
-	}
-	log.Errorf("Healthcheck failed for %s", url)
-	os.Exit(1)
-}
+// #nosec - turn off gosec checking which flags `http.Get(url)`

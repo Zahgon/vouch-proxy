@@ -24,15 +24,10 @@ https://github.com/vouch/vouch-proxy#submitting-a-pull-request-for-a-new-feature
 
 import (
 	"embed"
-	"errors"
 	"flag"
-	"fmt"
-	"io/fs"
 	"log"
 	"net"
 	"net/http"
-	"os"
-	"os/user"
 	"strconv"
 	"strings"
 	"time"
@@ -44,11 +39,7 @@ import (
 
 	"github.com/vouch/vouch-proxy/handlers"
 	"github.com/vouch/vouch-proxy/pkg/cfg"
-	"github.com/vouch/vouch-proxy/pkg/cookie"
-	"github.com/vouch/vouch-proxy/pkg/domains"
-	"github.com/vouch/vouch-proxy/pkg/healthcheck"
 	"github.com/vouch/vouch-proxy/pkg/jwtmanager"
-	"github.com/vouch/vouch-proxy/pkg/responses"
 	"github.com/vouch/vouch-proxy/pkg/timelog"
 )
 
@@ -88,8 +79,8 @@ type fwdToZapWriter struct {
 }
 
 func (fw *fwdToZapWriter) Write(p []byte) (n int, err error) {
-	fw.logger.Error(string(p))
-	return len(p), nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 // configure() is essentially init()
@@ -100,39 +91,7 @@ func (fw *fwdToZapWriter) Write(p []byte) (n int, err error) {
 // this has a cascading effect on the zap logger since the log level can be set on the command line
 // configure() explicitly calls package configure functions (domains.Configure() etc) mostly to set the logger
 // without this setup testing and logging are screwed up
-func configure() {
-	flag.Parse()
-
-	if *help {
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-
-	if *showVersion {
-		fmt.Printf("%s\n", semver)
-		os.Exit(0)
-	}
-
-	cfg.Templates = templatesFs
-	cfg.Defaults = defaultsFs
-
-	cfg.Configure()
-	healthcheck.CheckAndExitIfIsHealthCheck()
-
-	logger = cfg.Logging.Logger
-	fastlog = cfg.Logging.FastLogger
-
-	if err := cfg.ValidateConfiguration(); err != nil {
-		logger.Fatal(err)
-	}
-
-	domains.Configure()
-	jwtmanager.Configure()
-	cookie.Configure()
-	responses.Configure()
-	handlers.Configure()
-	timelog.Configure()
-}
+func configure() { _ = "STUB: not implemented"; return }
 
 func main() {
 	configure()
@@ -223,58 +182,13 @@ func main() {
 }
 
 func listen() (lis net.Listener, cleanupFn func(), err error) {
-	if !strings.HasPrefix(cfg.Cfg.Listen, "unix:") {
-		lis, err = net.Listen("tcp", fmt.Sprintf("%s:%d", cfg.Cfg.Listen, cfg.Cfg.Port))
-		return lis, func() {}, err
-	}
-
-	socketPath := strings.TrimPrefix(cfg.Cfg.Listen, "unix:")
-	_, err = os.Stat(socketPath)
-	if err == nil {
-		if err = os.Remove(socketPath); err != nil {
-			return nil, nil, fmt.Errorf("remove existing socket file %s: %w", socketPath, err)
-		}
-	} else if !os.IsNotExist(err) {
-		return nil, nil, fmt.Errorf("stat socket file %s: %w", socketPath, err)
-	}
-
-	lis, err = net.Listen("unix", socketPath)
-	if err != nil {
-		return nil, nil, fmt.Errorf("listen %s: %w", socketPath, err)
-	}
-
-	mode := fs.FileMode(cfg.Cfg.SocketMode) // defaults to 0660 - see .defaults.yml
-	if err = os.Chmod(socketPath, mode); err != nil {
-		return nil, nil, fmt.Errorf("chmod socket file %s %#o", socketPath, mode)
-	}
-
-	if cfg.Cfg.SocketGroup != "" {
-		group, err := user.LookupGroup(cfg.Cfg.SocketGroup)
-		if err != nil {
-			return nil, nil, fmt.Errorf("lookup socket group: %s %w", cfg.Cfg.SocketGroup, err)
-		}
-		gid, err := strconv.Atoi(group.Gid)
-		if err != nil {
-			return nil, nil, fmt.Errorf("lookup socket group: invalid gid: %w", err)
-		}
-		if err := os.Chown(socketPath, -1, gid); err != nil {
-			return nil, nil, fmt.Errorf("chown socket: group: %s %w", socketPath, err)
-		}
-	}
-	return lis, func() { _ = os.Remove(socketPath) }, nil
+	_ = "STUB: not implemented"
+	return *new(net.Listener), nil, nil
 }
 
-func checkTCPPortAvailable(listen string) {
-	logger.Debug("checking availability of tcp port: " + listen)
-	conn, err := net.Listen("tcp", listen)
-	if err != nil {
-		logger.Error(err)
-		logger.Fatal(errors.New(listen + " is not available (is " + cfg.Branding.FullName + " already running?)"))
-	}
-	if err = conn.Close(); err != nil {
-		logger.Error(err)
-	}
-}
+// defaults to 0660 - see .defaults.yml
+
+func checkTCPPortAvailable(listen string) { _ = "STUB: not implemented"; return }
 
 // if you'd like to enable profiling uncomment these
 // func addProfilingHandlers(router *httprouter.Router) {

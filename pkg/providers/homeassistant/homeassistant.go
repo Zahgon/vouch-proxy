@@ -15,7 +15,6 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/vouch/vouch-proxy/pkg/providers/common"
 	"github.com/vouch/vouch-proxy/pkg/structs"
 )
 
@@ -26,18 +25,16 @@ type Provider struct{}
 
 // Configure see main.go configure()
 func (Provider) Configure() {
+	_ = "STUB: not implemented"
 	// log = cfg.Logging.Logger
+	return
 }
 
 // GetUserInfo provider specific call to get userinfomation
 // More info: https://developers.home-assistant.io/docs/en/auth_api.html
 func (Provider) GetUserInfo(r *http.Request, user *structs.User, customClaims *structs.CustomClaims, ptokens *structs.PTokens, opts ...oauth2.AuthCodeOption) (rerr error) {
-	_, providerToken, err := common.PrepareTokensAndClient(r, ptokens, false, opts...)
-	if err != nil {
-		return err
-	}
-	ptokens.PAccessToken = providerToken.Extra("access_token").(string)
-	// Home assistant does not provide an API to query username, so we statically set it to "homeassistant"
-	user.Username = "homeassistant"
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Home assistant does not provide an API to query username, so we statically set it to "homeassistant"
